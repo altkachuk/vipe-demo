@@ -34,11 +34,3 @@ colmap mapper \
     --output_path $COLMAP_DIR/sparse
 
 echo "=== COLMAP reconstruction done ==="
-
-# Convert to VIPE format
-python scripts/colmap_to_vipe.py \
-    --input $COLMAP_DIR/sparse/0 \
-    --output $SCENE_DIR \
-    --images $RAW_DIR/images
-
-echo "=== Dataset ready for VIPE at: $SCENE_DIR ==="
