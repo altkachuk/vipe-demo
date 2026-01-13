@@ -12,7 +12,7 @@ COLMAP_DIR="data/colmap/${DATASET_NAME}"
 SCENE_DIR="data/scene/${DATASET_NAME}"
 
 # Convert to VIPE format
-python src.colmap.colmap_to_vipe.py \
+python -m src.data.colmap_to_vipe \
     --input $COLMAP_DIR/sparse/0 \
     --output $SCENE_DIR \
     --images $RAW_DIR/images

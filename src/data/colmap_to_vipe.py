@@ -2,10 +2,10 @@ import argparse
 import os
 import json
 from pathlib import Path
-import numpy as np
 
 # You need a utility to read COLMAP binaries:
-from colmap.colmap_read_model import read_cameras_binary, read_images_binary
+from src.utils.colmap_read_model import read_cameras_binary, read_images_binary
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -38,18 +38,15 @@ def main():
             "model": cam.model,
             "width": cam.width,
             "height": cam.height,
-            "params": cam.params.tolist()
+            "params": cam.params.tolist(),
         }
 
     for img_id, img in images.items():
         R = img.qvec2rotmat()
         t = img.tvec
-        poses_list.append({
-            "image": img.name,
-            "rotation": R.tolist(),
-            "translation": t.tolist(),
-            "camera_id": img.camera_id
-        })
+        poses_list.append(
+            {"image": img.name, "rotation": R.tolist(), "translation": t.tolist(), "camera_id": img.camera_id}
+        )
 
     # Save cameras.json and poses.json
     with open(os.path.join(args.output, "cameras.json"), "w") as f:
@@ -58,6 +55,7 @@ def main():
         json.dump(poses_list, f, indent=2)
 
     print(f"VIPE dataset prepared at {args.output}")
+
 
 if __name__ == "__main__":
     main()
