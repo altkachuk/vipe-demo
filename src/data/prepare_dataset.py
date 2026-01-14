@@ -10,6 +10,7 @@ IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png"}
 def create_video_from_images(
     images_dir: Path,
     video_dir: Path,
+    video_name:str,
     framerate: int = 30,
     scale: float = 1.0,
     codec: str = "libx264",
@@ -17,7 +18,7 @@ def create_video_from_images(
 ):  
     video_dir.mkdir(parents=True, exist_ok=True)
 
-    video_path = video_dir / "video.mp4"
+    video_path = video_dir / f"{video_name}.mp4"
 
     # Check if there are images
     images = sorted([f for f in images_dir.iterdir() if f.suffix.lower() in IMAGE_EXTENSIONS])
@@ -100,6 +101,7 @@ def main():
     parser = argparse.ArgumentParser(description="Prepare existing raw dataset for COLMAP/VIPE")
     parser.add_argument("--raw_input", required=True, help="Path to raw dataset folder")
     parser.add_argument("--dataset_output", required=True, help="Output dataset directory for COLMAP/VIPE")
+    parser.add_argument("--video_name", required=True, help="Output dataset directory for COLMAP/VIPE")
     parser.add_argument("--vipe_scale", required=True, help="ViPE video scale")
 
     args = parser.parse_args()
@@ -111,7 +113,7 @@ def main():
     vipe_scale = args.vipe_scale
 
     prepare_dataset(raw_input, images_dir)
-    create_video_from_images(images_dir, video_path, scale=vipe_scale)
+    create_video_from_images(images_dir, video_path, video_name=args.video_name, scale=vipe_scale)
 
 
 if __name__ == "__main__":

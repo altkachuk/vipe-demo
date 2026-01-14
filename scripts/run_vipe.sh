@@ -33,14 +33,16 @@ PY
 )
 EOF
 
-VIDEO_PATH="data/datasets/${NAME}/video/video.mp4"
-VIPE_DIR="data/vipe/${NAME}"
+VIDEO_PATH="data/datasets/${NAME}/video/${NAME}.mp4"
+VIPE_DIR="data/vipe"
 
 mkdir -p $VIPE_DIR
 
 echo "=== Running ViPE SfM on dataset: $NAME ==="
 
 # Feature extraction (COLMAP reads intrinsics + GPS from EXIF automatically)
-vipe infer $VIDEO_PATH --pipeline=no_vda --ouput=$VIPE_DIR
+vipe infer $VIDEO_PATH --pipeline=no_vda --output=$VIPE_DIR
+
+python /root/vipe/scripts/vipe_to_colmap.py "$VIPE_DIR" --sequence "$NAME" 
 
 echo "=== ViPE reconstruction done ==="

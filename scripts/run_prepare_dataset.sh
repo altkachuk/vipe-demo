@@ -45,4 +45,5 @@ echo "VIPE scale: $VIPE_SCALE"
 python -m src.data.prepare_dataset \
   --raw_input "$RAW_DIR" \
   --dataset_output "$DATASET_DIR" \
+  --video_name "$NAME" \
   --vipe_scale "$VIPE_SCALE"
