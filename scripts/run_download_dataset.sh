@@ -10,9 +10,33 @@ if [ -z "$DATASET_NAME" ] || [ -z "$ZIP_PATH" ]; then
 fi
 
 PROJECT_ROOT=$(cd "$(dirname "$0")/.." && pwd)
-OUTPUT_DIR="$PROJECT_ROOT/data/raw/$DATASET_NAME"
+CONFIG_FILE="$PROJECT_ROOT/configs/datasets/${DATASET_NAME}.yaml"
 
-echo "Preparing dataset '$DATASET_NAME'"
+if [ ! -f "$CONFIG_FILE" ]; then
+  echo "Config file not found: $CONFIG_FILE"
+  exit 1
+fi
+
+echo "Using config: $CONFIG_FILE"
+
+# Read values from YAML using Python
+read -r NAME <<EOF
+$(python - <<PY
+import yaml
+
+with open("$CONFIG_FILE") as f:
+    cfg = yaml.safe_load(f)
+
+name = cfg.get("name")
+
+print(name)
+PY
+)
+EOF
+
+OUTPUT_DIR="$PROJECT_ROOT/data/raw/$NAME"
+
+echo "Preparing dataset '$NAME'"
 echo "From ZIP: $ZIP_PATH"
 echo "Into: $OUTPUT_DIR"
 

@@ -33,28 +33,14 @@ PY
 )
 EOF
 
-IMAGES_DIR="data/datasets/${NAME}"
-COLMAP_DIR="data/colmap/${NAME}"
+VIDEO_PATH="data/datasets/${NAME}/video/video.mp4"
+VIPE_DIR="data/vipe/${NAME}"
 
-mkdir -p $COLMAP_DIR
+mkdir -p $VIPE_DIR
 
-echo "=== Running COLMAP SfM on dataset: $NAME ==="
+echo "=== Running ViPE SfM on dataset: $NAME ==="
 
 # Feature extraction (COLMAP reads intrinsics + GPS from EXIF automatically)
-colmap feature_extractor \
-    --database_path $COLMAP_DIR/database.db \
-    --image_path $IMAGES_DIR/images \
-    --ImageReader.single_camera 1
+vipe infer $VIDEO_PATH --pipeline=no_vda --ouput=$VIPE_DIR
 
-# Feature matching
-colmap exhaustive_matcher \
-    --database_path $COLMAP_DIR/database.db
-
-# Sparse reconstruction (mapping)
-mkdir -p $COLMAP_DIR/sparse
-colmap mapper \
-    --database_path $COLMAP_DIR/database.db \
-    --image_path $RAW_DIR/images \
-    --output_path $COLMAP_DIR/sparse
-
-echo "=== COLMAP reconstruction done ==="
+echo "=== ViPE reconstruction done ==="

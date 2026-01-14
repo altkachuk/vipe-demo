@@ -1,10 +1,9 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -e
 
 DATASET_NAME=$1
-
 if [ -z "$DATASET_NAME" ]; then
-  echo "Usage: run_prepare_dataset.sh <dataset_name>"
+  echo "Usage: run_vipe.sh <dataset_name>"
   exit 1
 fi
 
@@ -34,15 +33,16 @@ PY
 )
 EOF
 
-RAW_DIR="$PROJECT_ROOT/data/raw/$NAME"
-DATASET_DIR="$PROJECT_ROOT/data/datasets/$NAME"
+VIDEO_PATH="data/datasets/${NAME}/video/video.mp4"
+VIPE_DIR="data/vipe/${NAME}"
 
-echo "Preparing dataset: $NAME"
-echo "Raw images dir: $RAW_DIR"
-echo "Output dir: $DATASET_DIR"
-echo "VIPE scale: $VIPE_SCALE"
+mkdir -p $VIPE_DIR
 
-python -m src.data.prepare_dataset \
-  --raw_input "$RAW_DIR" \
-  --dataset_output "$DATASET_DIR" \
-  --vipe_scale "$VIPE_SCALE"
+echo "=== Running ViPE SfM on dataset: $NAME ==="
+
+# Feature extraction (COLMAP reads intrinsics + GPS from EXIF automatically)
+vipe infer $VIDEO_PATH --pipeline=no_vda --ouput=$VIPE_DIR
+
+python /root/vipe/scripts/vipe_to_colmap.py "$VIPE_DIR" --sequence "$NAME" 
+
+echo "=== ViPE reconstruction done ==="
