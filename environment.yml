@@ -18,10 +18,9 @@ dependencies:
   # =========================
   # CUDA (toolkit only)
   # =========================
-  - cuda-nvcc-12-8
-  - libcublas-dev-12-8
-  - libcusparse-dev-12-8
-  - libcusolver-dev-12-8
+  - libcublas-dev
+  - libcusparse-dev
+  - libcusolver-dev
 
   # =========================
   # Build / system
