@@ -1,0 +1,7 @@
+name: zavod70
+
+dataset:
+  vipe_scale: 0.25
+
+vipe:
+  pipeline: no_vda

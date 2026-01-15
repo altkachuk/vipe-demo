@@ -1,10 +1,13 @@
 name: vipe
 channels:
-  - pytorch
   - nvidia
   - conda-forge
+  - nodefaults
+
 dependencies:
+  # =========================
   # Core
+  # =========================
   - python=3.11
   - pip
   - numpy
@@ -12,26 +15,51 @@ dependencies:
   - tqdm
   - pyyaml
 
-  # CUDA
-  - pytorch
-  - pytorch-cuda=12.1
-  - torchvision
+  # =========================
+  # CUDA (toolkit only)
+  # =========================
+  - libcublas-dev
+  - libcusparse-dev
+  - libcusolver-dev
 
-  # Vision / geometry
-  - opencv
-  - scikit-image
-  - imageio
-  - imageio-ffmpeg
-
-  # System & utilities
+  # =========================
+  # Build / system
+  # =========================
   - cmake
   - ninja
   - eigen
   - boost
+  - zlib
 
-  # Python-only deps
+  # =========================
+  # Pip dependencies
+  # =========================
   - pip:
-      - gdown
-      - matplotlib
-      - rich
+      # PyTorch CUDA 12.8
+      - torch==2.7.0+cu128
+      - torchvision==0.22.0+cu128
+      - --extra-index-url https://download.pytorch.org/whl/cu128
+
+      # CLI / config
+      - click
+      - hydra-core
+      - omegaconf
       - tyro
+      - rich
+
+      # Vision / math
+      - einops
+      - kornia
+      - timm
+      - transformers
+      - opencv-python
+      - scikit-image
+      - matplotlib
+      - imageio[ffmpeg]
+      - OpenEXR<3.3.0
+
+      # VIPE / research tooling
+      - python-pycg
+      - rerun-sdk
+      - viser
+      - ray
