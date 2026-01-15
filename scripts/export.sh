@@ -3,15 +3,19 @@ set -e
 
 DATASET_NAME=$1
 PROJECT_DIR=$2
-OUTPUT_DIR=$3
-DOCKER_NAME=$4
+DOCKER_NAME=$3
 
-if [ -z "$DATASET_NAME" ] || [ -z "$PROJECT_DIR" ] || [ -z "$OUTPUT_DIR" ] || [ -z "$DOCKER_NAME" ]; then
-  echo "Usage: run_vipe.sh <dataset_name> <project_dir> <output_dir> <docker_name>"
+if [ -z "$DATASET_NAME" ] || [ -z "$PROJECT_DIR" ] || [ -z "$DOCKER_NAME" ]; then
+  echo "Usage: run_export.sh <dataset_name> <project_dir> <docker_name>"
   exit 1
 fi
 
+# Use the directory where this script is located
+SCRIPT_DIR=$(dirname "$0")
+OUTPUT_DIR=$(realpath "$SCRIPT_DIR")
+
 echo "=== Running export on dataset: $DATASET_NAME ==="
+echo "Output directory: $OUTPUT_DIR"
 
 mkdir -p "$OUTPUT_DIR/colmap"
 mkdir -p "$OUTPUT_DIR/vipe_colmap"
