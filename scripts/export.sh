@@ -22,8 +22,10 @@ mkdir -p "$OUTPUT_DIR/vipe_colmap"
 
 docker cp "$DOCKER_NAME:$PROJECT_DIR/data/colmap/$DATASET_NAME" \
           "$OUTPUT_DIR/colmap"
+docker cp "$DOCKER_NAME:$PROJECT_DIR/data/datasets/$DATASET_NAME/images" \
+          "$OUTPUT_DIR/colmap/$DATASET_NAME/images"
 
-docker cp "$DOCKER_NAME:$PROJECT_DIR/data/vipe_colmap/$DATASET_NAME" \
+docker cp "$DOCKER_NAME:$PROJECT_DIR/data/vipe/"$DATASET_NAME"_colmap"/$DATASET_NAME \
           "$OUTPUT_DIR/vipe_colmap"
 
 echo "=== Export done ==="
