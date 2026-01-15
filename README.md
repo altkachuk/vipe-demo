@@ -25,6 +25,11 @@ Run the included script to install system dependencies and Miniconda:
 bash scripts/setup/setup_system.sh
 ```
 
+Activate conda:
+```bash
+source ~/miniconda3/bin/activate
+```
+
 Set up environment:
 
 ```bash
@@ -44,7 +49,7 @@ conda activate vipe
 Clone the ViPE repository:
 
 ```bash
-gitclone https://github.com/nv-tlabs/vipe.git
+git clone https://github.com/nv-tlabs/vipe.git
 cd vipe
 ```
 
