@@ -8,7 +8,7 @@ if [ -z "$DATASET_NAME" ]; then
   exit 1
 fi
 
-PROJECT_ROOT=$(cd "$(dirname "$0")/.." && pwd)
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 CONFIG_FILE="$PROJECT_ROOT/configs/datasets/${DATASET_NAME}.yaml"
 
 if [ ! -f "$CONFIG_FILE" ]; then

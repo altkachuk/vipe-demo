@@ -22,7 +22,7 @@ Instructions for setting up and running the Docker container are provided in the
 Run the included script to install system dependencies and Miniconda:
 
 ```bash
-bash scripts/system_setup.sh
+bash scripts/setup/setup_system.sh
 ```
 
 Set up environment:
@@ -75,10 +75,12 @@ pip install -v --no-build-isolation -e .
 conda install -c conda-forge colmap cuda-version=12
 ```
 
-Check installation:
+Reboot computer
+
+Check installation (CUDA is supported):
 
 ```bash
-colmap gui
+colmap --help | grep -i cuda
 ```
 
 If using Docker with GUI, follow:
@@ -118,7 +120,7 @@ VIPE_ROOT=/root/vipe
 ## 2. Download dataset
 
 ```bash
-bash scripts/download_dataset.sh <dataset_name> <path_to_zip_file>
+bash scripts/pipelines/download_dataset.sh <dataset_name> <path_to_zip_file>
 
 ```
 
@@ -147,7 +149,7 @@ pipeline:no_vda
 ## 3. Dataset preparation
 
 ```bash
-bash scripts/prepare_dataset.sh <dataset_name>
+bash scripts/pipelines/prepare_dataset.sh <dataset_name>
 
 ```
 
@@ -158,7 +160,7 @@ This script prepares the dataset in **COLMAP format** and generates the video so
 ## 4. ViPE reconstruction
 
 ```bash
-bash scripts/vipe.sh <dataset_name>
+bash scripts/pipelines/vipe.sh <dataset_name>
 
 ```
 
@@ -169,7 +171,7 @@ Runs the ViPE reconstruction pipeline and converts the results to COLMAP format 
 ## 5. COLMAP reconstruction (optional)
 
 ```bash
-bash scripts/colmap.sh <dataset_name>
+bash scripts/pipelines/colmap.sh <dataset_name>
 
 ```
 
@@ -182,14 +184,14 @@ Runs COLMAP reconstruction on the dataset. Use this if you want an alternative o
 You can automatically run dataset preparation + ViPE reconstruction (steps 3–4) with:
 
 ```bash
-bash scripts/run_pipeline.sh <dataset_name>
+bash scripts/pipelines/run_pipeline.sh <dataset_name>
 
 ```
 
 To skip specific steps:
 
 ```bash
-bash scripts/run_full_pipeline.sh <dataset_name> --skip-colmap --skip-vipe
+bash scripts/pipelines/run_pipeline.sh <dataset_name> --skip-colmap --skip-vipe
 
 ```
 
@@ -309,7 +311,7 @@ docker ps -a
 docker start ubuntu22-vipe
 
 # Connect to running container
-dockerexec -it ubuntu22-vipe bash
+docker exec -it ubuntu22-vipe bash
 
 ```
 
@@ -322,6 +324,6 @@ dockerexec -it ubuntu22-vipe bash
 docker stop ubuntu22-vipe
 
 # Remove container
-dockerrm ubuntu22-vipe
+docker rm ubuntu22-vipe
 
 ```

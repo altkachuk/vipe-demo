@@ -7,7 +7,7 @@ if [ -z "$DATASET_NAME" ]; then
   exit 1
 fi
 
-PROJECT_ROOT=$(cd "$(dirname "$0")/.." && pwd)
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 # =========================
 # Load .env
@@ -79,10 +79,12 @@ mkdir -p "$VIPE_DIR"
 
 echo "=== Running ViPE SfM on dataset: $NAME ==="
 
+echo "=== ViPE pipeline: $PIPELINE ==="
+
 # =========================
 # Run ViPE
 # =========================
-vipe infer "$VIDEO_PATH" --pipeline="$PIPLINE" --output="$VIPE_DIR"
+vipe infer "$VIDEO_PATH" --pipeline="$PIPELINE" --output="$VIPE_DIR"
 
 # =========================
 # Convert to COLMAP

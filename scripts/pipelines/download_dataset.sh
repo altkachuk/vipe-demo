@@ -14,7 +14,9 @@ if [ ! -f "$ZIP_PATH" ]; then
   exit 1
 fi
 
-PROJECT_ROOT=$(cd "$(dirname "$0")/.." && pwd)
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+echo "Project dir: $PROJECT_ROOT"
+
 CONFIG_FILE="$PROJECT_ROOT/configs/datasets/${DATASET_NAME}.yaml"
 
 if [ ! -f "$CONFIG_FILE" ]; then
