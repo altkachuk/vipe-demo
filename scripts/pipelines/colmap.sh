@@ -3,9 +3,14 @@ set -e
 
 DATASET_NAME=$1
 if [ -z "$DATASET_NAME" ]; then
-  echo "Usage: run_colmap.sh <dataset_name>"
+  echo "Usage: colmap.sh <dataset_name>"
   exit 1
 fi
+
+command -v colmap >/dev/null 2>&1 || {
+  echo "COLMAP is not installed or not in PATH"
+  exit 1
+}
 
 PROJECT_ROOT=$(cd "$(dirname "$0")/.." && pwd)
 CONFIG_FILE="$PROJECT_ROOT/configs/datasets/${DATASET_NAME}.yaml"
@@ -18,25 +23,26 @@ fi
 echo "Using config: $CONFIG_FILE"
 
 # Read values from YAML using Python
-read -r NAME VIPE_SCALE <<EOF
-$(python - <<PY
+NAME=$(python - <<PY
 import yaml
-
 with open("$CONFIG_FILE") as f:
     cfg = yaml.safe_load(f)
-
 name = cfg.get("name")
-scale = cfg.get("vipe_scale", 1.0)
-
-print(name, scale)
+if name is None:
+    raise ValueError("Config must contain 'name'")
+print(name)
 PY
 )
-EOF
 
-IMAGES_DIR="data/datasets/${NAME}"
-COLMAP_DIR="data/colmap/${NAME}"
+IMAGES_DIR="$PROJECT_ROOT/data/datasets/${NAME}"
+COLMAP_DIR="$PROJECT_ROOT/data/colmap/${NAME}"
 
-mkdir -p $COLMAP_DIR
+if [ ! -d "$IMAGES_DIR/images" ]; then
+  echo "Images directory not found: $IMAGES_DIR/images"
+  exit 1
+fi
+
+mkdir -p "$COLMAP_DIR"
 
 echo "=== Running COLMAP SfM on dataset: $NAME ==="
 
@@ -54,7 +60,7 @@ colmap exhaustive_matcher \
 mkdir -p $COLMAP_DIR/sparse
 colmap mapper \
     --database_path $COLMAP_DIR/database.db \
-    --image_path $RAW_DIR/images \
+    --image_path $IMAGES_DIR/images \
     --output_path $COLMAP_DIR/sparse
 
 echo "=== COLMAP reconstruction done ==="

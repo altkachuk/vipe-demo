@@ -27,7 +27,7 @@ with open("$CONFIG_FILE") as f:
     cfg = yaml.safe_load(f)
 
 name = cfg.get("name")
-scale = cfg.get("vipe_scale", 1.0)
+scale = cfg.get("dataset", {}).get("vipe_scale", 1.0)
 
 print(name, scale)
 PY
@@ -36,6 +36,13 @@ EOF
 
 RAW_DIR="$PROJECT_ROOT/data/raw/$NAME"
 DATASET_DIR="$PROJECT_ROOT/data/datasets/$NAME"
+
+if [ ! -d "$RAW_DIR" ]; then
+  echo "Raw dataset not found: $RAW_DIR"
+  exit 1
+fi
+
+mkdir -p "$DATASET_DIR"
 
 echo "Preparing dataset: $NAME"
 echo "Raw images dir: $RAW_DIR"

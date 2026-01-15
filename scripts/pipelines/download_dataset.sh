@@ -5,7 +5,12 @@ DATASET_NAME=$1
 ZIP_PATH=$2
 
 if [ -z "$DATASET_NAME" ] || [ -z "$ZIP_PATH" ]; then
-  echo "Usage: run_download_dataset.sh <dataset_name> <path_to_zip>"
+  echo "Usage: download_dataset.sh <dataset_name> <path_to_zip>"
+  exit 1
+fi
+
+if [ ! -f "$ZIP_PATH" ]; then
+  echo "ZIP file not found: $ZIP_PATH"
   exit 1
 fi
 
@@ -19,24 +24,22 @@ fi
 
 echo "Using config: $CONFIG_FILE"
 
-# Read values from YAML using Python
-read -r NAME <<EOF
-$(python - <<PY
+NAME=$(python - <<PY
 import yaml
-
 with open("$CONFIG_FILE") as f:
     cfg = yaml.safe_load(f)
-
 name = cfg.get("name")
-
+if name is None:
+    raise ValueError("Config must contain 'name'")
 print(name)
 PY
 )
-EOF
 
 OUTPUT_DIR="$PROJECT_ROOT/data/raw/$NAME"
 
-echo "Preparing dataset '$NAME'"
+mkdir -p "$OUTPUT_DIR"
+
+echo "Downloading dataset '$NAME'"
 echo "From ZIP: $ZIP_PATH"
 echo "Into: $OUTPUT_DIR"
 
