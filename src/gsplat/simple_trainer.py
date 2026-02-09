@@ -16,7 +16,7 @@ import tyro
 import viser
 import yaml
 from gsplat.color_correct import color_correct_affine, color_correct_quadratic
-from datasets.colmap import Dataset, Parser
+from datasets.colmap import Dataset, Parser, InputFormat
 from datasets.traj import (
     generate_ellipse_path_z,
     generate_interpolated_path,
@@ -43,6 +43,9 @@ from nerfview import CameraState, RenderTabState, apply_float_colormap
 
 @dataclass
 class Config:
+    # Input format
+    input_format:str = InputFormat.VIPE
+
     # Disable viewer
     disable_viewer: bool = False
     # Path to the .pt files. If provide, it will skip training and run evaluation only.
@@ -86,7 +89,7 @@ class Config:
     # Steps to save the model
     save_steps: List[int] = field(default_factory=lambda: [7_000, 30_000])
     # Whether to save ply file (storage size can be large)
-    save_ply: bool = False
+    save_ply: bool = True
     # Steps to save the model as ply
     ply_steps: List[int] = field(default_factory=lambda: [7_000, 30_000])
     # Whether to disable video generation during training and evaluation
@@ -354,6 +357,7 @@ class Runner:
             normalize=cfg.normalize_world_space,
             test_every=cfg.test_every,
             load_exposure=cfg.load_exposure,
+            input_format=cfg.input_format,
         )
         self.trainset = Dataset(
             self.parser,
@@ -716,9 +720,9 @@ class Runner:
             self.trainset,
             batch_size=cfg.batch_size,
             shuffle=True,
-            num_workers=4,
-            persistent_workers=True,
-            pin_memory=True,
+            num_workers=0,
+            persistent_workers=False,
+            pin_memory=False,
         )
         trainloader_iter = iter(trainloader)
 

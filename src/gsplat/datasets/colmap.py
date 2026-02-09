@@ -11,6 +11,7 @@ from PIL import Image
 from pycolmap import SceneManager
 from tqdm import tqdm
 from typing_extensions import assert_never
+from enum import Enum
 
 from exif import compute_exposure_from_exif
 from .normalize import (
@@ -19,6 +20,10 @@ from .normalize import (
     transform_cameras,
     transform_points,
 )
+
+class InputFormat(str, Enum):
+    VIPE = 'vipe'
+    COLMAP = 'colmap'
 
 
 def _get_rel_paths(path_dir: str) -> List[str]:
@@ -65,6 +70,7 @@ class Parser:
         normalize: bool = False,
         test_every: int = 8,
         load_exposure: bool = False,
+        input_format: InputFormat = InputFormat.VIPE
     ):
         self.data_dir = data_dir
         self.factor = factor
@@ -211,9 +217,14 @@ class Parser:
         image_id_to_name = {v: k for k, v in manager.name_to_image_id.items()}
         for point_id, data in manager.point3D_id_to_images.items():
             for image_id, _ in data:
-                image_name = image_id_to_name[image_id]
+                # TODO: Fix for vipe images format
+                if input_format == InputFormat.COLMAP:
+                    image_name = image_id_to_name[image_id]
+                elif input_format == InputFormat.VIPE:
+                    image_name = image_id_to_name[image_id + 1]
                 point_idx = manager.point3D_id_to_point3D_idx[point_id]
                 point_indices.setdefault(image_name, []).append(point_idx)
+                
         point_indices = {
             k: np.array(v).astype(np.int32) for k, v in point_indices.items()
         }

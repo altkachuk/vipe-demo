@@ -9,6 +9,28 @@ if [ -z "$DATASET_NAME" ]; then
 fi
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+
+# =========================
+# Load .env
+# =========================
+ENV_FILE="$PROJECT_ROOT/.env"
+if [ ! -f "$ENV_FILE" ]; then
+  echo ".env file not found at $ENV_FILE"
+  exit 1
+fi
+
+set -a
+source "$ENV_FILE"
+set +a
+
+if [ -z "$CONDA_BASE" ]; then
+  echo "CONDA_BASE is not set in .env"
+  exit 1
+fi
+
+source $CONDA_BASE
+conda activate vipe
+
 CONFIG_FILE="$PROJECT_ROOT/configs/datasets/${DATASET_NAME}.yaml"
 
 if [ ! -f "$CONFIG_FILE" ]; then

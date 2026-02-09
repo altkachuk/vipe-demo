@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-ENV_NAME="vipe"
+ENV_NAME=$1
 
 echo "Creating conda environment: $ENV_NAME"
 
@@ -11,7 +11,7 @@ if conda env list | grep -q "^$ENV_NAME "; then
     exit 1
 fi
 
-conda env create -f environment.yml
+conda env create -f ${ENV_NAME}.environment.yml
 
 echo
 echo "Environment created successfully!"

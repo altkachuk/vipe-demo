@@ -1,9 +1,16 @@
 #!/bin/bash
 set -e
 
+
 DATASET_NAME=$1
 if [ -z "$DATASET_NAME" ]; then
   echo "Usage: vipe.sh <dataset_name>"
+  exit 1
+fi
+
+MAX_STEPS=$2
+if [ -z "$MAX_STEPS" ]; then
+  echo "Usage: vipe.sh <max_steps>"
   exit 1
 fi
 
@@ -28,26 +35,7 @@ if [ -z "$CONDA_BASE" ]; then
 fi
 
 source $CONDA_BASE
-conda activate vipe
-
-
-if [ -z "$VIPE_ROOT" ]; then
-  echo "VIPE_ROOT is not set in .env"
-  exit 1
-fi
-
-if [ ! -d "$VIPE_ROOT" ]; then
-  echo "VIPE_ROOT directory does not exist: $VIPE_ROOT"
-  exit 1
-fi
-
-# =========================
-# Check vipe CLI
-# =========================
-command -v vipe >/dev/null 2>&1 || {
-  echo "vipe CLI not found in PATH"
-  exit 1
-}
+conda activate gsplat2
 
 # =========================
 # Load dataset config
@@ -76,23 +64,23 @@ PY
 )
 EOF
 
-VIDEO_PATH="$PROJECT_ROOT/data/datasets/${NAME}/video/${NAME}.mp4"
-VIPE_DIR="$PROJECT_ROOT/data/vipe/${NAME}"
-
-if [ ! -f "$VIDEO_PATH" ]; then
-  echo "Video not found: $VIDEO_PATH"
+COLMAP_DIR="$PROJECT_ROOT/data/vipe/${NAME}_colmap/$NAME"
+if [ ! -d "$COLMAP_DIR" ]; then
+  echo "COLMAP_DIR directory does not exist: $COLMAP_DIR"
   exit 1
 fi
 
-mkdir -p "$VIPE_DIR"
 
-echo "=== Running ViPE SfM on dataset: $NAME ==="
+GSPLAT_DIR="$PROJECT_ROOT/data/gsplat/${NAME}"
+mkdir -p "$GSPLAT_DIR"
 
-echo "=== ViPE pipeline: $PIPELINE ==="
+echo "=== Running GS training on dataset: $NAME ==="
+CUDA_VISIBLE_DEVICES=0 python src/gsplat/simple_trainer.py default \
+  --data_dir $COLMAP_DIR \
+  --data_factor 1 \
+  --result_dir $GSPLAT_DIR \
+  --input_format vipe \
+  --max_steps $MAX_STEPS
 
-# =========================
-# Run ViPE
-# =========================
-vipe infer "$VIDEO_PATH" --pipeline="$PIPELINE" --output="$VIPE_DIR"
 
-echo "=== ViPE reconstruction done ==="
+echo "=== GS training done ==="
