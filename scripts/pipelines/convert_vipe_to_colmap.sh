@@ -28,8 +28,7 @@ if [ -z "$CONDA_BASE" ]; then
 fi
 
 source $CONDA_BASE
-conda activate vipe
-
+conda activate vipe2
 
 if [ -z "$VIPE_ROOT" ]; then
   echo "VIPE_ROOT is not set in .env"
@@ -76,13 +75,7 @@ PY
 )
 EOF
 
-VIDEO_PATH="$PROJECT_ROOT/data/datasets/${NAME}/video/${NAME}.mp4"
 VIPE_DIR="$PROJECT_ROOT/data/vipe/${NAME}"
-
-if [ ! -f "$VIDEO_PATH" ]; then
-  echo "Video not found: $VIDEO_PATH"
-  exit 1
-fi
 
 mkdir -p "$VIPE_DIR"
 
@@ -91,8 +84,30 @@ echo "=== Running ViPE SfM on dataset: $NAME ==="
 echo "=== ViPE pipeline: $PIPELINE ==="
 
 # =========================
-# Run ViPE
+# Convert to COLMAP
 # =========================
-vipe infer "$VIDEO_PATH" --pipeline="$PIPELINE" --output="$VIPE_DIR"
+VIPE_TO_COLMAP="$VIPE_ROOT/scripts/vipe_to_colmap.py"
+
+if [ ! -f "$VIPE_TO_COLMAP" ]; then
+  echo "vipe_to_colmap.py not found at $VIPE_TO_COLMAP"
+  exit 1
+fi
+
+python "$VIPE_TO_COLMAP" "$VIPE_DIR" --sequence "$NAME"
+
+COLMAP_DIR="${VIPE_DIR}_colmap/$NAME"
+sed -i 's| images/| |g' $COLMAP_DIR/images.txt
+
+SPARSE_DIR="$COLMAP_DIR/sparse/0"
+mkdir -p "$SPARSE_DIR"
+
+mv "$COLMAP_DIR/cameras.txt" $SPARSE_DIR
+mv "$COLMAP_DIR/images.txt" $SPARSE_DIR
+mv "$COLMAP_DIR/points3D.txt" $SPARSE_DIR
+
+colmap model_converter \
+    --input_path $SPARSE_DIR \
+    --output_path $SPARSE_DIR \
+    --output_type BIN
 
 echo "=== ViPE reconstruction done ==="
